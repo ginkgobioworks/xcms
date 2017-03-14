@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# multtest, msdata, and faahKO are needed for running unit tests
+# Install xcms from bioconductor to automatically get all the deps; we'll install ourselves over
+# that version
+
+MAKEFLAGS='R_XTRA_CXXFLAGS=-Wno-deprecated-declarations' R --no-save <<EOR
+  source("http://bioconductor.org/biocLite.R")
+  biocLite("xcms")
+  biocLite("multtest")
+  biocLite("msdata")
+  biocLite("faahKO")
+EOR
+
