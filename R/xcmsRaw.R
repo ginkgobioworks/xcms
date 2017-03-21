@@ -692,7 +692,7 @@ setMethod("findPeaks.matchedFilter", "xcmsRaw", function(object, fwhm = 30, sigm
         object <- split(object, f=keepidx)[["TRUE"]]
     }
 
-    
+
 ### Create EIC buffer
     mrange <- range(object@env$mz)
     mass <- seq(floor(mrange[1]/step)*step, ceiling(mrange[2]/step)*step, by = step)
@@ -1099,7 +1099,7 @@ setMethod("centWaveOnROI", "xcmsRaw", function(object, scanrange, basenames, ver
             l <- layout(matrix(c(1,2,3),nr=3,nc=1,byrow=T),heights=c(.5,.75,2));
             par(mar= c(2, 4, 4, 2) + 0.1)
             plotRaw(object,mzrange=mzrange,rtrange=trange,log=TRUE,title='')
-            title(main=paste(f,': ', round(mzrange[1],4),' - ',round(mzrange[2],4),' m/z , dppm=',cdppm,', EGauss=',egauss ,',  S/N =',csn,sep=''))
+            title(main=paste(roi_index,': ', round(mzrange[1],4),' - ',round(mzrange[2],4),' m/z , dppm=',cdppm,', EGauss=',egauss ,',  S/N =',csn,sep=''))
             par(mar= c(1, 4, 1, 2) + 0.1)
             image(y=scales[1:(dim(wCoefs)[2])],z=wCoefs,col=terrain.colors(256),xaxt='n',ylab='CWT coeff.')
             par(mar= c(4, 4, 1, 2) + 0.1)
@@ -1186,10 +1186,10 @@ setMethod("findPeaks.centWave", "xcmsRaw", function(object, ppm=25, peakwidth=c(
         si <- which(object@scantime >= rtrange[1] & object@scantime <= rtrange[2])
         scmin <- si[1]
         scmax <- si[length(si)]
-        
+
         rawmz <- rawMZ(object, mzrange=mzrange, scanrange=c(scmin, scmax))
         gz <- which(rawmz > 0)
-        if (length(gz) > 0) { 
+        if (length(gz) > 0) {
           # Define a big ROI for the entire region
           mzmin <- min(rawmz[gz])
           mzmax <- max(rawmz[gz])
@@ -1266,7 +1266,7 @@ setMethod("findPeaks.centWave", "xcmsRaw", function(object, ppm=25, peakwidth=c(
             return(invisible(nopeaks))
         }
     }
-    
+
     lf <- length(roi_list)
 
     if (!targeted && lf > 0) { # add defaults to each ROI
@@ -2039,11 +2039,11 @@ setMethod("findPeaks.massifquant", "xcmsRaw", function(object, ppm=10, peakwidth
         colnames(p) <- basenames;
 
         #calculate median index
-        p[,"rt"] = as.integer(p[,"rtmin"] + ( (p[,"rt"] + 1) / 2 ) - 1); 
+        p[,"rt"] = as.integer(p[,"rtmin"] + ( (p[,"rt"] + 1) / 2 ) - 1);
         #convert from index into actual time
-        p[,"rtmin"] = object@scantime[p[,"rtmin"]]; 
-        p[,"rtmax"] = object@scantime[p[,"rtmax"]]; 
-        p[,"rt"] = object@scantime[p[,"rt"]]; 
+        p[,"rtmin"] = object@scantime[p[,"rtmin"]];
+        p[,"rtmax"] = object@scantime[p[,"rtmax"]];
+        p[,"rt"] = object@scantime[p[,"rt"]];
 
         uorder <- order(p[,"into"], decreasing=TRUE);
         pm <- as.matrix(p[,c("mzmin","mzmax","rtmin","rtmax"),drop=FALSE]);
