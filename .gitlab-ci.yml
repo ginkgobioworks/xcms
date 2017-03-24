@@ -39,11 +39,7 @@ test:
   image: $BUILD_IMAGE
   variables:
     GIT_STRATEGY: clone
-    GIT_SSH_COMMAND: ssh -o StrictHostKeyChecking=no
     BUMP: none
-  before_script:
-    - eval $(ssh-agent -s)
-    - ssh-add <(echo "$SSH_PRIVATE_KEY")
   script:
     - git config user.email || git config --global user.email "$GITLAB_USER_EMAIL"
     - git config user.name  || git config --global user.name  "Gitlab Build $CI_BUILD_ID"
@@ -92,13 +88,7 @@ github-push:
   image: $BUILD_IMAGE
   variables:
     GIT_STRATEGY: clone
-    GIT_SSH_COMMAND: ssh -o StrictHostKeyChecking=no
-  before_script:
-    - eval $(ssh-agent -s)
-    - ssh-add <(echo "$SSH_PRIVATE_KEY")
   script:
-    - git config user.email || git config --global user.email "$GITLAB_USER_EMAIL"
-    - git config user.name  || git config --global user.name  "Gitlab Build $CI_BUILD_ID"
     - cd $CI_PROJECT_DIR
     - git checkout github
     - git remote set-url --push github "git@github.com:ginkgobioworks/xcms.git"
