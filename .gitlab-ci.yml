@@ -1,0 +1,97 @@
+stages:
+  - build
+  - test
+  - bump
+  - release
+
+variables:
+  BUILD_IMAGE: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_SLUG
+
+
+build:
+  stage: build
+  tags:
+    - rancher-runner
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build --pull -t $BUILD_IMAGE .
+    - docker push $BUILD_IMAGE
+
+
+test:
+  stage: test
+  tags:
+    - rancher-runner
+  image: $BUILD_IMAGE
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - cd $XCMS_HOME
+    - make test
+  except:
+    - tags
+
+
+.bump: &bump-default
+  stage: bump
+  tags:
+    - rancher-runner
+  image: $BUILD_IMAGE
+  variables:
+    GIT_STRATEGY: clone
+    BUMP: none
+  script:
+    - git config user.email || git config --global user.email "$GITLAB_USER_EMAIL"
+    - git config user.name  || git config --global user.name  "Gitlab Build $CI_BUILD_ID"
+    - cd $CI_PROJECT_DIR
+    - git checkout master
+    - make bump/$BUMP
+    - git remote set-url --push origin "git@git.ginkgobioworks.com:$CI_PROJECT_PATH.git"
+    - git push --tags origin master
+  when: manual
+  only:
+    - master
+  except:
+    - tags
+
+bump-mod:
+  <<: *bump-default
+  variables:
+    GIT_STRATEGY: clone
+    BUMP: mod
+
+
+pypi-release:
+  stage: release
+  environment:
+    name: ginkgo-pypi
+    url: https://pypi.ginkgobioworks.com/simple/xcms/
+  tags:
+    - rancher-runner
+  image: $BUILD_IMAGE
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - cd $MS_HOME
+    - make release
+  only:
+    - tags
+
+
+github-push:
+  stage: release
+  environment:
+    name: github
+    url: https://github.com/ginkgobioworks/xcms/
+  tags:
+    - rancher-runner
+  image: $BUILD_IMAGE
+  variables:
+    GIT_STRATEGY: clone
+  script:
+    - cd $CI_PROJECT_DIR
+    - git checkout github
+    - git remote set-url --push github "git@github.com:ginkgobioworks/xcms.git"
+    - git push --follow-tags github github:master
+  only:
+    - github

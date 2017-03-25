@@ -1,0 +1,14 @@
+version: '2'
+services:
+  xcms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+    # Persist caches and deps after rebuilds
+    - caches:/root/.cache
+    # Local mappings to rapidly-changing files
+    - .:/usr/src/xcms
+    tty: true
+volumes:
+  caches:
