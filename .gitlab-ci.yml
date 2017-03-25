@@ -72,7 +72,7 @@ pypi-release:
   variables:
     GIT_STRATEGY: none
   script:
-    - cd $MS_HOME
+    - cd $XCMS_HOME
     - make release
   only:
     - tags
