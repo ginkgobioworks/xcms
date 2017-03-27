@@ -1,40 +1,97 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-try:
-    from setuptools import setup
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup
 
-import subprocess, os, sys
+import os
+import subprocess
 
-def install():
-    R_install_dir = '%s/R' % (os.environ['HOME'],)
-    try:
-        os.mkdir(R_install_dir)
-    except OSError:
-        pass
-    ccmd = 'R CMD INSTALL -l %s .' % (R_install_dir,)
-    subprocess.call(ccmd.split(' '))
+from distutils.cmd import Command
+from setuptools import setup
+from setuptools.command.develop import develop
+from setuptools.command.install import install
 
-if sys.argv[1] not in ('egg_info',):
-    install()
+
+class InstallXcmsCommand(Command):
+  """ Install XCMS using the Python developer tools """
+
+  description = 'install XCMS'
+  user_options = [
+    ('xcms-install-dir=', None, 'R library/directory in which to install XCMS'),
+  ]
+
+  def initialize_options(self):
+    self.xcms_install_dir = os.environ.get('XCMS_INSTALL_DIR')
+
+  def finalize_options(self):
+    if self.xcms_install_dir:
+      assert os.path.isdir(self.xcms_install_dir), 'XCMS install path must be a valid directory'
+
+  def run(self):
+    xcms_install_args = []
+
+    if self.xcms_install_dir:
+      xcms_install_args = ['-l', self.xcms_install_dir]
+
+    subprocess.check_call(['R', 'CMD', 'INSTALL'] + xcms_install_args + ['.'])
+
+
+class InstallCommandWithXcms(install):
+  def run(self):
+    self.run_command('install_xcms')
+    install.run(self)
+
+
+class DevelopCommandWithXcms(develop):
+  def run(self):
+    self.run_command('install_xcms')
+    develop.run(self)
+
 
 setup(
-    name='xcms',
-    version='1.93.2-ext',
-    description='Extensions and fixes to XCMS',
-    author='Benjie Chen',
-    author_email='benjie@ginkgobioworks.com',
-    long_description=open('README', 'r').read(),
-    packages=[],
-    zip_safe=False,
-    requires=[],
-    install_requires=[],
-    classifiers=[
-      'Operating System :: OS Independent',
-      'Programming Language :: R',
-      'Topic :: Utilities'
+  name='xcms',
+  version='1.39.2+ginkgo2',
+
+  description="Ginkgo Bioworks' forked extensions and fixes to XCMS",
+  long_description=open('README.md', 'r').read(),
+  url='https://bioconductor.org/packages/release/bioc/html/xcms.html',
+
+  author='XCMS Team, Benjie Chen, Ginkgo Bioworks Test Devs',
+  author_email='test-devs@ginkgobioworks.com',
+
+  license='GPL-2.0',
+
+  classifiers=[
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
+    'Environment :: Other Environment',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
+    'Programming Language :: Other',
+    'Programming Language :: R',
+    'Programming Language :: C++',
+    'Topic :: Scientific/Engineering :: Bio-Informatics',
+    'Topic :: Scientific/Engineering :: Chemistry',
+    'Topic :: Scientific/Engineering :: Information Analysis',
+    'Topic :: Utilities',
+  ],
+
+  packages=[],
+  include_package_data=True,
+
+  cmdclass={
+    'install_xcms': InstallXcmsCommand,
+    'install': InstallCommandWithXcms,
+    'develop': DevelopCommandWithXcms,
+  },
+
+  install_requires=[],
+  zip_safe=False,
+
+  extras_require={
+    'release': [
+      'bumpversion',
+      'twine',
+      'wheel',
     ],
+  },
 )
