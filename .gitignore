@@ -1,5 +1,6 @@
 *~
 \#*\#
+dist
 
 inst/doc/example_box/
 inst/doc/example_eic/
@@ -8,6 +9,11 @@ inst/doc/xcmsDirect.pdf
 inst/doc/xcmsInstall.pdf
 inst/doc/xcmsMSn.pdf
 inst/doc/xcmsPreprocess.pdf
+inst/unitTests/report.html
+inst/unitTests/report.txt
+inst/unitTests/reportSummary.txt
+
+Rplots.pdf
 
 *.o
 .*.swp
@@ -15,3 +21,13 @@ src/xcms.so
 src/boost/
 src/boost_aux/
 src/pwiz/
+
+# Python
+*.egg
+*.egg-info
+*-build-env/
+pip-log.txt
+production.log
+develop-eggs
+.installed.cfg
+sdist
