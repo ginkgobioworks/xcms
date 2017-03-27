@@ -95,4 +95,4 @@ github-push:
     - git push --follow-tags github github:master
   when: manual
   only:
-    - tags
+    - master
