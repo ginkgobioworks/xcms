@@ -1,0 +1,22 @@
+include LICENSE NAMESPACE README
+include setup.py
+
+recursive-include R *
+
+recursive-include src *
+recursive-exclude src *.o
+exclude src/xcms.so
+
+recursive-include build *
+
+recursive-include inst *
+recursive-exclude inst/unitTests report.html
+recursive-exclude inst/unitTests report.txt
+recursive-exclude inst/unitTests reportSummary.txt
+
+recursive-include man *
+recursive-include tests *
+recursive-include vignettes *
+
+global-exclude *.vim
+global-exclude .*.swp
