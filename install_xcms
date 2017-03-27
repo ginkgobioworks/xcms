@@ -1,1 +1,10 @@
-R CMD INSTALL -l ~/R .
+#!/bin/bash
+
+XCMS_INSTALL_DIR=${XCMS_INSTALL_DIR:-$1}
+
+if [ -n "$XCMS_INSTALL_DIR" ]; then
+  mkdir -p "$XCMS_INSTALL_DIR"
+  R CMD INSTALL -l $XCMS_INSTALL_DIR .
+else
+  R CMD INSTALL .
+fi
