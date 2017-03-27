@@ -91,7 +91,7 @@ github-push:
   script:
     - cd $CI_PROJECT_DIR
     - git checkout github
-    - git remote set-url --push github "git@github.com:ginkgobioworks/xcms.git"
+    - git remote add github "git@github.com:ginkgobioworks/xcms.git"
     - git push --follow-tags github github:master
   when: manual
   only:
