@@ -1,6 +1,7 @@
-version: '2'
+version: '2.1'
 services:
   xcms:
+    image: ${BUILD_IMAGE:-xcms}
     build:
       context: .
       dockerfile: Dockerfile

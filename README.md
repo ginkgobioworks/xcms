@@ -1,4 +1,3 @@
-
 XCMS Extensions and Fixes
 =========================
 
@@ -86,6 +85,20 @@ R (`lib.loc` specifies where package is installed).
 ```
 
 or run R with the following environment variable: `R_LIBS_USER=[wherever you installed it]`
+
+
+Development at Ginkgo
+---------------------
+
+To expedite development at Ginkgo, our local version compiles the source and dependencies into a
+python sdist .tar.gz, and then installs them automatically with `pip`, from our PyPI server. This is
+just a convenient mechanism for dealing with the time-consuming compilation process and is not meant
+as a generic solution.
+
+To install XCMS on your own system in this way, run `pip install xcms`. To build XCMS and its
+dependencies inside a Docker image for local development and testing, run `make image`. This initial
+build will take a while, but subsequent builds should be fast, as they will not require
+reinstalation of the dependencies.
 
 
 Acknowledgment

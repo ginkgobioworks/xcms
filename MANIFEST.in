@@ -1,5 +1,8 @@
-include LICENSE NAMESPACE README
-include setup.py
+include LICENSE
+include NAMESPACE
+include README.md
+include DESCRIPTION
+include ./*.tar.gz
 
 recursive-include R *
 

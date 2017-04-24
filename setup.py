@@ -2,11 +2,53 @@
 
 import os
 import subprocess
+from glob import glob
 
 from distutils.cmd import Command
 from setuptools import setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
+from setuptools.command.sdist import sdist
+
+
+class InstallXcmsDepsCommand(Command):
+  """ Install XCMS deps """
+
+  description = 'install XCMS deps'
+  user_options = [
+    ('xcms-install-dir=', None, 'R library/directory in which to install XCMS'),
+  ]
+
+  def initialize_options(self):
+    self.xcms_install_dir = os.environ.get('XCMS_INSTALL_DIR')
+
+  def finalize_options(self):
+    if self.xcms_install_dir:
+      assert os.path.isdir(self.xcms_install_dir), 'XCMS install path must be a valid directory'
+
+  def run(self):
+    xcms_install_args = []
+
+    if self.xcms_install_dir:
+      xcms_install_args = ['-l', self.xcms_install_dir]
+
+    deps = [fn for fn in glob('*_*.tar.gz') if 'xcms' not in fn]
+    subprocess.check_call(['R', 'CMD', 'INSTALL'] + xcms_install_args + deps)
+
+
+class BuildXcmsCommand(Command):
+  description = 'build XCMS'
+
+  def initialize_options(self):
+    pass
+
+  def finalize_options(self):
+    pass
+
+  def run(self):
+    # Install dependencies
+    self.run_command('install_xcms_deps')
+    subprocess.check_call(['R', 'CMD', 'build', '--no-build-vignettes', '.'])
 
 
 class InstallXcmsCommand(Command):
@@ -25,12 +67,14 @@ class InstallXcmsCommand(Command):
       assert os.path.isdir(self.xcms_install_dir), 'XCMS install path must be a valid directory'
 
   def run(self):
+    self.run_command('build_xcms')
+
     xcms_install_args = []
 
     if self.xcms_install_dir:
       xcms_install_args = ['-l', self.xcms_install_dir]
 
-    subprocess.check_call(['R', 'CMD', 'INSTALL'] + xcms_install_args + ['.'])
+    subprocess.check_call(['R', 'CMD', 'INSTALL'] + xcms_install_args + glob('xcms_*.tar.gz'))
 
 
 class InstallCommandWithXcms(install):
@@ -43,6 +87,12 @@ class DevelopCommandWithXcms(develop):
   def run(self):
     self.run_command('install_xcms')
     develop.run(self)
+
+
+class SdistCommandWithXcms(sdist):
+  def run(self):
+    self.run_command('build_xcms')
+    sdist.run(self)
 
 
 setup(
@@ -79,19 +129,14 @@ setup(
   include_package_data=True,
 
   cmdclass={
+    'build_xcms': BuildXcmsCommand,
     'install_xcms': InstallXcmsCommand,
+    'install_xcms_deps': InstallXcmsDepsCommand,
     'install': InstallCommandWithXcms,
     'develop': DevelopCommandWithXcms,
+    'sdist': SdistCommandWithXcms,
   },
 
   install_requires=[],
   zip_safe=False,
-
-  extras_require={
-    'release': [
-      'bumpversion',
-      'twine',
-      'wheel',
-    ],
-  },
 )

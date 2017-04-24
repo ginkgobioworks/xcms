@@ -5,10 +5,9 @@
 # that version
 
 MAKEFLAGS='R_XTRA_CXXFLAGS=-Wno-deprecated-declarations' R --no-save <<EOR
-  source("http://bioconductor.org/biocLite.R")
-  biocLite("xcms")
-  biocLite("multtest")
-  biocLite("msdata")
-  biocLite("faahKO")
+  source("biocLite.R")
+  biocLite(pkgs=c("xcms", "multtest", "msdata", "faahKO"), INSTALL_opts=c("--build"), ask=FALSE)
 EOR
 
+# Remove the BioConductor-installed XCMS, so it doesn't conflict with the one we build
+rm -vf xcms*pc-linux-gnu.tar.gz
