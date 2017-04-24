@@ -5,7 +5,7 @@ stages:
   - release
 
 variables:
-  BUILD_IMAGE: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_SLUG
+  BUILD_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
 
 
 build:
@@ -13,7 +13,7 @@ build:
   tags:
     - rancher-runner
   script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker build --pull -t $BUILD_IMAGE .
     - docker push $BUILD_IMAGE
 
@@ -26,8 +26,7 @@ test:
   variables:
     GIT_STRATEGY: none
   script:
-    - cd $XCMS_HOME
-    - make test
+    - make -C $XCMS_HOME test
   except:
     - tags
 
@@ -42,7 +41,7 @@ test:
     BUMP: none
   script:
     - git config user.email || git config --global user.email "$GITLAB_USER_EMAIL"
-    - git config user.name  || git config --global user.name  "Gitlab Build $CI_BUILD_ID"
+    - git config user.name  || git config --global user.name  "Gitlab Build $CI_JOB_ID"
     - cd $CI_PROJECT_DIR
     - git checkout master
     - make bump/$BUMP

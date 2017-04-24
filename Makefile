@@ -1,13 +1,13 @@
 .PHONY: help clean clean-pyc clean-build \
 	lint \
-	test test-tox \
-	bump/major bump/minor bump/patch \
+	test \
+	bump/major bump/minor bump/patch bump/mod \
 	release sdist
 
 help:
 	@echo "test - run R tests"
 	@echo "sdist, bdist_wheel - package"
-	@echo "bump/major bump/minor bump/patch - bump the version"
+	@echo "bump/major bump/minor bump/patch bump/mod - bump the version"
 	@echo "release - package and upload a release"
 
 
