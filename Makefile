@@ -2,7 +2,7 @@
 	lint \
 	test test-tox \
 	bump/major bump/minor bump/patch \
-	release
+	release sdist
 
 help:
 	@echo "test - run R tests"
@@ -19,13 +19,9 @@ bump/major bump/minor bump/patch bump/mod:
 	bumpversion --verbose $(@F)
 
 
-release: sdist bdist_wheel
+release: sdist
 	twine upload dist/*
 
 sdist:
 	python setup.py sdist
-	ls -l dist
-
-bdist_wheel:
-	python setup.py bdist_wheel
 	ls -l dist
