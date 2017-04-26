@@ -1,13 +1,27 @@
 #!/usr/bin/env bash
 
+set -e
+set -x
+
 # multtest, msdata, and faahKO are needed for running unit tests
 # Install xcms from bioconductor to automatically get all the deps; we'll install ourselves over
 # that version
 
-MAKEFLAGS='R_XTRA_CXXFLAGS=-Wno-deprecated-declarations' R --no-save <<EOR
-  source("biocLite.R")
-  biocLite(pkgs=c("xcms", "multtest", "msdata", "faahKO"), INSTALL_opts=c("--build"), ask=FALSE)
+MAKEFLAGS='R_XTRA_CXXFLAGS=-std=c++11\ -Wno-deprecated-declarations' R --no-save <<EOR
+  library(BiocInstaller)
+  biocLite(
+    pkgs=c("xcms", "msdata", "faahKO"),
+    suppressUpdates=TRUE,
+    suppressAutoUpdate=TRUE,
+    ask=FALSE,
+    INSTALL_opts=c("--build", "--no-docs"),
+    Ncpus=1
+  )
 EOR
 
+# Bring all the dependencies together
+mkdir -p xcms-deps
+mv -v *_R_*.tar.gz xcms-deps
+
 # Remove the BioConductor-installed XCMS, so it doesn't conflict with the one we build
-rm -vf xcms*pc-linux-gnu.tar.gz
+rm -vf xcms-deps/xcms*_R_*.tar.gz

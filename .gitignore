@@ -32,3 +32,6 @@ production.log
 develop-eggs
 .installed.cfg
 sdist
+
+xcms-deps
+xcms*.tar.gz

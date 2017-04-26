@@ -8,23 +8,21 @@ from distutils.cmd import Command
 from setuptools import setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
-from setuptools.command.sdist import sdist
 
 
 class InstallXcmsDepsCommand(Command):
-  """ Install XCMS deps """
-
   description = 'install XCMS deps'
+
   user_options = [
-    ('xcms-install-dir=', None, 'R library/directory in which to install XCMS'),
+    ('xcms-install-dir=', None, 'R library/directory in which to install XCMS deps'),
   ]
 
   def initialize_options(self):
     self.xcms_install_dir = os.environ.get('XCMS_INSTALL_DIR')
 
   def finalize_options(self):
-    if self.xcms_install_dir:
-      assert os.path.isdir(self.xcms_install_dir), 'XCMS install path must be a valid directory'
+    if self.xcms_install_dir and not os.path.isdir(self.xcms_install_dir):
+      os.makedirs(self.xcms_install_dir)
 
   def run(self):
     xcms_install_args = []
@@ -32,29 +30,13 @@ class InstallXcmsDepsCommand(Command):
     if self.xcms_install_dir:
       xcms_install_args = ['-l', self.xcms_install_dir]
 
-    deps = [fn for fn in glob('*_*.tar.gz') if 'xcms' not in fn]
+    deps = [fn for fn in glob('xcms-deps/*_R_*.tar.gz') if 'xcms' not in os.path.basename(fn)]
     subprocess.check_call(['R', 'CMD', 'INSTALL'] + xcms_install_args + deps)
 
 
-class BuildXcmsCommand(Command):
-  description = 'build XCMS'
-
-  def initialize_options(self):
-    pass
-
-  def finalize_options(self):
-    pass
-
-  def run(self):
-    # Install dependencies
-    self.run_command('install_xcms_deps')
-    subprocess.check_call(['R', 'CMD', 'build', '--no-build-vignettes', '.'])
-
-
 class InstallXcmsCommand(Command):
-  """ Install XCMS using the Python developer tools """
-
   description = 'install XCMS'
+
   user_options = [
     ('xcms-install-dir=', None, 'R library/directory in which to install XCMS'),
   ]
@@ -63,36 +45,54 @@ class InstallXcmsCommand(Command):
     self.xcms_install_dir = os.environ.get('XCMS_INSTALL_DIR')
 
   def finalize_options(self):
-    if self.xcms_install_dir:
-      assert os.path.isdir(self.xcms_install_dir), 'XCMS install path must be a valid directory'
+    if self.xcms_install_dir and not os.path.isdir(self.xcms_install_dir):
+      os.makedirs(self.xcms_install_dir)
 
   def run(self):
-    self.run_command('build_xcms')
-
     xcms_install_args = []
 
     if self.xcms_install_dir:
       xcms_install_args = ['-l', self.xcms_install_dir]
 
-    subprocess.check_call(['R', 'CMD', 'INSTALL'] + xcms_install_args + glob('xcms_*.tar.gz'))
+      # Propagate build dir arg to deps install command so deps get installed in the same place
+      build_xcms_command_obj = self.distribution.get_command_obj('install_xcms_deps')
+      build_xcms_command_obj.xcms_install_dir = self.xcms_install_dir
+
+    self.run_command('install_xcms_deps')
+    subprocess.check_call(['R', 'CMD', 'INSTALL', '--no-docs'] + xcms_install_args + ['.'])
+
+
+class RemoveXcmsCommand(Command):
+  description = 'uninstall XCMS'
+
+  def initialize_options(self):
+    pass
+
+  def finalize_options(self):
+    pass
+
+  def run(self):
+    subprocess.check_call(['R', 'CMD', 'REMOVE', 'xcms'])
 
 
 class InstallCommandWithXcms(install):
   def run(self):
-    self.run_command('install_xcms')
     install.run(self)
+
+    # Install R packages wherever this command is being directed to install to
+    install_xcms_command_obj = self.distribution.get_command_obj('install_xcms')
+    install_xcms_command_obj.xcms_install_dir = os.path.join(self.install_data, 'R', 'site-library')
+    self.run_command('install_xcms')
 
 
 class DevelopCommandWithXcms(develop):
   def run(self):
-    self.run_command('install_xcms')
     develop.run(self)
 
-
-class SdistCommandWithXcms(sdist):
-  def run(self):
-    self.run_command('build_xcms')
-    sdist.run(self)
+    # Install R packages wherever this command is being directed to install to
+    install_xcms_command_obj = self.distribution.get_command_obj('install_xcms')
+    install_xcms_command_obj.xcms_install_dir = os.path.join(self.install_data, 'R', 'site-library')
+    self.run_command('install_xcms')
 
 
 setup(
@@ -115,7 +115,7 @@ setup(
     'Intended Audience :: Science/Research',
     'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
     'Natural Language :: English',
-    'Operating System :: OS Independent',
+    'Operating System :: POSIX :: Linux',
     'Programming Language :: Other',
     'Programming Language :: R',
     'Programming Language :: C++',
@@ -129,12 +129,11 @@ setup(
   include_package_data=True,
 
   cmdclass={
-    'build_xcms': BuildXcmsCommand,
     'install_xcms': InstallXcmsCommand,
     'install_xcms_deps': InstallXcmsDepsCommand,
+    'remove_xcms': RemoveXcmsCommand,
     'install': InstallCommandWithXcms,
     'develop': DevelopCommandWithXcms,
-    'sdist': SdistCommandWithXcms,
   },
 
   install_requires=[],

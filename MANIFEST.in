@@ -1,9 +1,10 @@
 include LICENSE
 include NAMESPACE
-include README.md
+include README
 include DESCRIPTION
-include ./*.tar.gz
 
+include xcms*.tar.gz
+recursive-include  xcms-deps/ *_R_*.tar.gz
 recursive-include R *
 
 recursive-include src *
