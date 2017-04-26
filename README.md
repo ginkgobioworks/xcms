@@ -1,4 +1,3 @@
-
 XCMS Extensions and Fixes
 =========================
 
@@ -86,6 +85,33 @@ R (`lib.loc` specifies where package is installed).
 ```
 
 or run R with the following environment variable: `R_LIBS_USER=[wherever you installed it]`
+
+
+Usage at Ginkgo
+---------------
+
+To expedite development at Ginkgo, our local version precompiles the source and dependencies into
+binary archives, and adds them into a Python 'sdist'-style `.tar.gz` file. When the package is
+installed with Python's package management tools (via `setup.py install`, or `pip install`), it
+installs the compiled R dependencies and then builds and installs XCMS. This is just a convenient
+mechanism for dealing with the time-consuming compilation process and is not meant as a generic
+solution.
+
+To install XCMS on your own system in this way, run `pip install xcms`, making sure that your pip
+is configured to point to the Ginkgo PyPI server. Your distribution will need to have
+preinstalled versions of R and the other R packages specified in the `Dockerfile` as well.
+
+Development at Ginkgo
+---------------------
+
+To build XCMS and its dependencies inside a Docker image for local development and testing, run
+`make image`. This initial build will take a while, but subsequent builds should be fast, as they
+will not require recompilation of the dependencies, in particular `mzR`, which takes a while to
+build.
+
+Note that the volume mappings in docker-compose are designed to keep the built dependency packages
+in the `xcms-deps` directory from appearing on the host file system, but still visible to the docker
+image. Everything else in the `/usr/src/xcms` directory is mapped 1:1.
 
 
 Acknowledgment

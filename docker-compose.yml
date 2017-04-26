@@ -1,6 +1,7 @@
-version: '2'
+version: '2.1'
 services:
   xcms:
+    image: ${BUILD_IMAGE:-xcms}
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,6 +10,8 @@ services:
     - caches:/root/.cache
     # Local mappings to rapidly-changing files
     - .:/usr/src/xcms
+    # Do not map over the built dependencies inside the image
+    - /usr/src/xcms/xcms-deps
     tty: true
 volumes:
   caches:

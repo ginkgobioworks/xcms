@@ -13,6 +13,7 @@ inst/unitTests/report.html
 inst/unitTests/report.txt
 inst/unitTests/reportSummary.txt
 
+.Rhistory
 Rplots.pdf
 
 *.o
@@ -31,3 +32,6 @@ production.log
 develop-eggs
 .installed.cfg
 sdist
+
+xcms-deps
+xcms*.tar.gz
