@@ -10,7 +10,7 @@ set -x
 MAKEFLAGS='R_XTRA_CXXFLAGS=-std=c++11\ -Wno-deprecated-declarations' R --no-save <<EOR
   library(BiocInstaller)
   biocLite(
-    pkgs=c("xcms", "msdata", "faahKO"),
+    pkgs=c("xcms", "msdata", "faahKO", "RANN", "MassSpecWavelet"),
     suppressUpdates=TRUE,
     suppressAutoUpdate=TRUE,
     ask=FALSE,
