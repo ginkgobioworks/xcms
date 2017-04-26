@@ -104,6 +104,8 @@ release-image:
   only:
     - tags
 
+# Triggered from master, but releases from the github branch. This is because we don't want
+# a .gitlab-ci.yml file in the github repo.
 release-github:
   stage: release
   environment:

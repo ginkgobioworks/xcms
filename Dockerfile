@@ -10,9 +10,10 @@ RUN mkdir -p $XCMS_HOME
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-# CRAN packages catools, runit, and xml are needed for running unit tests.
-# As long as we use BiocInstaller from ubuntu's package, any packages compiled
-# by BioConductor from source should work
+# Install as many Bioconductor and CRAN packagages from binary as we can to save build time.
+# As long as we use the biocLite function from the BiocInstaller library in the Ubuntu package,
+# instead of downloading it fresh, any additional packages that it compiles from source should
+# be the right ones for this release of Bioconductor and R version (3.2)
 RUN apt-get --assume-yes update && apt-get --assume-yes install --verbose-versions \
   r-base-core \
   r-base-dev \
