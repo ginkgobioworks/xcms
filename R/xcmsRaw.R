@@ -890,7 +890,7 @@ setMethod("centWaveOnROI", "xcmsRaw", function(object, scanrange, basenames, ver
         sdthr <-  sdnoise * snthresh
 
         ## is there any data above S/N * threshold ?
-        if (!(any(fd - baseline >= sdthr)))
+        if (!(any(fd - baseline >= sdthr, na.rm=TRUE)))
             return(peaks)
 
         wCoefs <- MSW.cwt(d, scales=scales, wavelet='mexh')
