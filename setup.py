@@ -91,7 +91,12 @@ class DevelopCommandWithXcms(develop):
 
     # Install R packages wherever this command is being directed to install to
     install_xcms_command_obj = self.distribution.get_command_obj('install_xcms')
-    install_xcms_command_obj.xcms_install_dir = os.path.join(self.install_data, 'R', 'site-library')
+    install_xcms_command_obj.xcms_install_dir = os.path.join(
+      self.install_data,
+      'lib',
+      'R',
+      'site-library',
+    )
     self.run_command('install_xcms')
 
 
