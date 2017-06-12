@@ -110,7 +110,7 @@ setup(
   version='1.39.2+ginkgo5',
 
   description="Ginkgo Bioworks' forked extensions and fixes to XCMS",
-  long_description=open('README.md', 'r').read(),
+  long_description=open('README', 'r').read(),
   url='https://bioconductor.org/packages/release/bioc/html/xcms.html',
 
   author='XCMS Team, Benjie Chen, Ginkgo Bioworks Test Devs',
