@@ -107,7 +107,7 @@ class DevelopCommandWithXcms(develop):
 
 setup(
   name='xcms',
-  version='1.39.2+ginkgo5',
+  version='1.39.2+ginkgo6',
 
   description="Ginkgo Bioworks' forked extensions and fixes to XCMS",
   long_description=open('README', 'r').read(),
