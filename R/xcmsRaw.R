@@ -1187,6 +1187,12 @@ setMethod("findPeaks.centWave", "xcmsRaw", function(object, ppm=25, peakwidth=c(
         scmin <- si[1]
         scmax <- si[length(si)]
 
+        if(is.na(scmin) || is.na(scmax)) {
+          cat("Warning: scanrange ", rtrange, "outside rtrange in file. Target ignored.\n")
+          next
+        }
+
+
         rawmz <- rawMZ(object, mzrange=mzrange, scanrange=c(scmin, scmax))
         gz <- which(rawmz > 0)
         if (length(gz) > 0) {
