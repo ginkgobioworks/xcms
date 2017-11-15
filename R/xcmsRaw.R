@@ -1172,6 +1172,14 @@ setMethod("findPeaks.centWave", "xcmsRaw", function(object, ppm=25, peakwidth=c(
       for (ti in 1:length(targets)) {
         target <- targets[[ti]]
         rtrange <- target$rtrange
+        if(rtrange[1] < scanrange[1]) {
+            cat("Warning: scanrange of ", rtrange[1], "less than minimum rtrange in file. Target ignored.\n")
+            next
+        }
+        if(rtrange[2] > scanrange[2]) {
+            cat("Warning: scanrange of ", rtrange[2], "greater than maximum rtrange in file. Target ignored.\n")
+            next
+        }
         mzrange <- target$mzrange
         t_peakwidth <- target$peakwidth
         if (is.null(t_peakwidth)) t_peakwidth <- peakwidth
